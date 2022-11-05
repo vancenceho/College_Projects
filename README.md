@@ -3,7 +3,7 @@ To house college projects, assignments and inspirations.
 
 # Singapore University of Technology & Design (SUTD) - CTD
 
-... Week 8
+... Week 8 
 ProblemSet_1.py - Basic printing. 
 ProblemSet2A.py - Basic printing/data structures & types/common mathematical algorithms. 
 
