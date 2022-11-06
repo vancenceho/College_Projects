@@ -6,6 +6,8 @@ To house college projects, assignments and inspirations.
 ... Week 8   
 ProblemSet_1.py - Basic printing.   
 ProblemSet2A.py - Basic printing/data structures & types/common mathematical algorithms.  
+ProblemSet2B.py - Basic initialization of mathematical functions.   
+ProblemSet2C.py - Basic functions: Sequences & Check Values.  
   
 # Temasek Polytechnic (TP) Projects - TP {Module Name}  
 Modules consists of DSAG ( Data Structures & Algorithms ) & Coding & Testing ( CODT ).  
