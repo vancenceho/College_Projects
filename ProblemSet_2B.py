@@ -40,14 +40,20 @@ print(seconds_to_hours(7210)) # output = 2, 0, 10
 
 # Problem 2.14 - Temperature Conversion (Fahrenheit => Celsius) 
 def fahrenheit_to_celsius(f):
-    c = (f - 32) * (5/9)
-    if c < 0:
+    if f == None:
         return None
     else:
-        c = round(c, 2)
-        return c
+        c = (float(f) - 32) * float((5/9))
+        if c >= -273.15:
+            c = round(c, 2)
+            return c
+        else:
+            return None
 
 print(fahrenheit_to_celsius(-500)) # output = None
 print(fahrenheit_to_celsius(32)) # output = 0.0
 print(fahrenheit_to_celsius(99)) # output = 37.22
 print(fahrenheit_to_celsius(212)) # output = 100.0
+print(fahrenheit_to_celsius(None))
+print(fahrenheit_to_celsius(-460))
+print(fahrenheit_to_celsius(-459))
