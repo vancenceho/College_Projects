@@ -98,7 +98,7 @@ def largest_area(s, u, v):
         return None
     else:
         area = [u * v, u * (s - v), v * (s - u), (s - u) * (s - v)]
-        return area
+        return max(area)
 
 result = largest_area(10, 3, 4)
 print(result)
