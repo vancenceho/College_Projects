@@ -66,6 +66,7 @@ codes = {
 # Fill in the sequence and add "sub" or "exit sub" as needed.
 answers = ['e', 'sub', 'c', 'sub', 'b', 'exit sub', 'd', 'sub', 'f', 'sub', 'b', 'exit sub', 'd', 'sub', 'a']
 
+# max_child(array, index, heap_size) - Version 1
 def max_child(array, index, heap_size):
      if right_of(index) >= heap_size:
          return left_of(index)
@@ -75,6 +76,14 @@ def max_child(array, index, heap_size):
           else:
               return right_of(index)
 
+# max_child(array, index, heap_size) - Version 2
+def max_child_v2(array, index, heap_size):
+    if right_of(index) >= heap_size:
+        return left_of(index)
+    if array[left_of(index)] > array[right_of(index)]:
+        return left_of(index)
+    return right_of(index)
+
 # test case
 maxheap = [16, 14, 10, 8, 7, 9, 3, 2, 4, 1]
 print(max_child(maxheap, 0, len(maxheap)))
@@ -82,6 +91,11 @@ print(max_child(maxheap, 2, len(maxheap)))
 print(max_child(maxheap, 3, len(maxheap)))
 print(max_child(maxheap, 1, len(maxheap)))
 print(max_child(maxheap, 4, len(maxheap)))
+assert max_child(maxheap, 0, len(maxheap)) == 1
+assert max_child(maxheap, 2, len(maxheap)) == 5
+assert max_child(maxheap, 3, len(maxheap)) == 8
+assert max_child(maxheap, 1, len(maxheap)) == 3
+assert max_child(maxheap, 4, len(maxheap)) == 9
 
 # CS2.Binary Heap : Write two functions. 
 # - `max_heapify(array, index, size)`: that moves the node down so as to satisfy the heap property. 
@@ -114,9 +128,15 @@ def max_heapify(array, index, size):
 def build_max_heap(array):
     n = len(array)
     # start from the middle or non-leaf node.
-    starting_index = int(n / 2) - 1
-    for current_index in range(starting_index, 0):
-        max_heapify(array, current_index)
+    starting_index = int(n // 2) - 1
+    for current_index in range(starting_index, -1, -1):
+        max_heapify(array, current_index, n)
+
+# test case
+array = [4, 1, 3, 2, 16, 9, 10, 14, 8, 7]
+build_max_heap(array)
+print(array)
+assert array == [16, 14, 10, 8, 7, 9, 3, 2, 4, 1]
 
 # CS3. Heapsort: Implement heapsort algorithm following the pseudocode in Binary Heap and Heapsort.
 
@@ -124,13 +144,50 @@ def build_max_heap(array):
 def heapsort(array):
     build_max_heap(array)
     # index of the last element in the heap.
-    heap_end_pos = len(array) - 1
-    while (heap_end_pos > 0):
-        array[0], array[heap_end_pos] = array[heap_end_pos], array[0]
+    heapsize = len(array)
+    while (heapsize > 0):
+        array[0], array[heapsize - 1] = array[heapsize - 1], array[0]
         # reduce heap size.
-        heap_end_pos = heap_end_pos - 1
-        max_heapify(array, 0, 0)
+        heapsize -= 1
+        max_heapify(array, 0, heapsize)
+
+# test case 
+array = [16, 14, 10, 8, 7, 9, 3, 2, 4, 1]
+heapsort(array)
+print(array)
+assert array == [1, 2, 3, 4, 7, 8, 9, 10, 14, 16]
 
 # CS4. Measure computational time of Python's built-in sort function by filling the template below. 
 # Hint: You will need the function gen_random_int() from Week 01 Problem Set.
 # Use sorted(list) function of Python's list See Python's Sorting HOW TO Documentation.
+import time 
+import random
+
+def run_function(f, x):
+    start = time.time()
+    f(x)
+    end = time.time()
+    return end-start
+
+def gen_random_int(number, seed):
+    result = []
+    for i in range(number):
+        result.append(i)
+    random.seed(seed)
+    random.shuffle(result)
+    return result
+
+time_builtin = []
+# set the maximum power for 10^power number of inputs.
+maxpower = 7
+
+for n in range(1, maxpower + 1):
+    # appending array for 10^1, 10^2, etc.
+    array = gen_random_int(10**n, 100)
+
+    # call run_function with sorted() and arrays as arguments.
+    # result = run_function()
+    result = run_function(sorted, array)
+    time_builtin.append(result)
+
+print(time_builtin)
