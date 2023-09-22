@@ -83,7 +83,7 @@ assert array == [1, 2, 4, 3, 9, 7, 8, 10, 14, 16]
 
 def build_min_heap(array):
     n = len(array)
-    starting_index = int(n // 2) - 1
+    starting_index = int(n / 2) - 1
     for current_index in range(starting_index, -1, -1):
         min_heapify(array, current_index, n)
 
@@ -122,6 +122,11 @@ def heapsort(array):
     build_min_heap(array)
     heapsize = len(array)
     while (heapsize > 0):
+        # swap the first element with the last element in the heap.
+        # min_heapify()
+        # pop the first element of the array and append to result
+        # heapsize -= 1
+        # return array
         result.append(array[0])
         heapsize -= 1
         min_heapify(array, 0, heapsize)
