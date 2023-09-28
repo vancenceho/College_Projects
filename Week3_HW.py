@@ -97,3 +97,28 @@ assert result == [4, 16, 10, 14, 7, 9, 3, 2, 8, 1]
 # The second function is the recursive function with two arguments String 1 (str1) and and String 2 (str2). 
 # The first function calls the second method permutate("", s) at the beginning. 
 # The second function should use a loop to move a character from str2 to str1 and recursively invokes it with a new str1 and str2.
+
+# permutate_recursive(str1, str2, result)
+def permutate_recursive(str1, str2, result):
+    if len(str2) == 0:
+        result.append(str1)
+    else:
+        for i in range(len(str2)):
+            # choose 1 character from str2
+            char = str2[i]
+            # create new strings str1_new and str2_new without the chosen character
+            str1_new = str1 + char
+            str2_new = str2[:i] + str2[i + 1:]
+            # recursively call the function with the new strings
+            permutate_recursive(str1_new, str2_new, result)
+
+# permutate(s)
+def permutate(s):
+    result = []
+    permutate_recursive("", s, result)
+    return result
+
+# test case
+input_str = "abc"
+output = permutate(input_str)
+print(output)
