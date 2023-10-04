@@ -1,4 +1,4 @@
-# WEEK 4 - COHORT 
+# WEEK 4 PROBLEM SET - COHORT SESSIONS 
 import math
 import time
 import random
@@ -143,7 +143,7 @@ print(a.x)
 # (2) - race(acceleration) which takes in an integer value for its acceleratin and modify both 
 # the speed and the position of the car.
 
-# Class definition - RacingCar
+# Class definition - RacingCar ------ ## assertion error on test case in vocareum
 class RacingCar:
 
     # definition of class
@@ -195,8 +195,8 @@ class RacingCar:
     def start(self, init_speed, finish_dist):
         if isinstance(init_speed, (int, float)) and init_speed > 0:
             self._speed = init_speed
-        if isintance(finish_dist, int):
-            self._finish = finish_distance
+        if isinstance(finish_dist, int):
+            self._finish = finish_dist
             self._pos = 0
         
     def race(self, acc):
@@ -237,7 +237,7 @@ print(car.is_finished) ### <---- calls the is_finished method
 # (4) - play(finish) which contains the main loop of the game that calls the RacingCar's method race() 
 #       until all cars reach the finish line. It takes in an argument for the finish distance.
 
-# Class definition - RacingGame
+# Class definition - RacingGame ----- assertion error on test case in vocareum
 class RacingGame:
 
     def __init__(self, seed):
@@ -300,7 +300,7 @@ class RacingGame:
 #        depending whether the stack is empty or not.
 # (2) - size is a computed property which returns the number of items in the stack.
 
-class Stack:
+class Stack:   # ----- attribute error on test in vocareum _Stack__items
 
     def __init__(self):
         self._items = []
@@ -329,7 +329,7 @@ s1 = Stack()
 s1.push(10)
 s1.push(20)
 print(s1.size)
-# print(s1._Stack__items) ### Name Mangling - Python's backfoor to access the double underscore
+# print(s1._Stack__items) ### Name Mangling - Python's backdoor to access the double underscore
 s1.push(2)
 assert not s1.is_empty
 assert s1.pop() == 2
@@ -392,7 +392,7 @@ class Stack:
     def size(self):
         return len(self._items)
 
-class Queue_with_Stack:
+class Queue_with_Stack: # ----- attribute error with test case in vocareum is_empty
     
     def __init__(self):
         # IN stack
