@@ -143,7 +143,7 @@ print(a.x)
 # (2) - race(acceleration) which takes in an integer value for its acceleratin and modify both 
 # the speed and the position of the car.
 
-# Class definition - RacingCar ------ ## assertion error on test case in vocareum
+# Class definition - RacingCar
 class RacingCar:
 
     # definition of class
@@ -159,16 +159,19 @@ class RacingCar:
     @property
     def racer(self):
         return self._racer
+    
     # decorator for setter name attribute
     @racer.setter
     def racer(self, name):
         if isinstance(name, str) and len(name) > 0:
             self._racer = name
+    
     # decorator for getter speed attribute
     @property
     def speed(self):
         # the value for the speed property is stored in self._speed
         return self._speed
+    
     # decorator for setter speed attribute
     @speed.setter
     def speed(self, val):
@@ -176,16 +179,19 @@ class RacingCar:
             if val >= 0 and val <= self.max_speed:
                 self._speed = val
         # no else ---> do nothing if condition is not met
+    
     # decorator for getter position attribute
     @property
     def pos(self):
         return self._pos
+    
     # decorator for setter position attribute
     @pos.setter
     def pos(self, val):
         if isinstance(val, int) and val >= 0:
             self._pos = val
         # no else ---> do nothing if condition is not met
+    
     # decorator for getter is_finished attribute
     @property
     # computed property ---> value returned from a calculation
@@ -237,7 +243,7 @@ print(car.is_finished) ### <---- calls the is_finished method
 # (4) - play(finish) which contains the main loop of the game that calls the RacingCar's method race() 
 #       until all cars reach the finish line. It takes in an argument for the finish distance.
 
-# Class definition - RacingGame ----- assertion error on test case in vocareum
+# Class definition - RacingGame
 class RacingGame:
 
     def __init__(self, seed):
@@ -300,19 +306,22 @@ class RacingGame:
 #        depending whether the stack is empty or not.
 # (2) - size is a computed property which returns the number of items in the stack.
 
-class Stack:   # ----- attribute error on test in vocareum _Stack__items
+class Stack:
 
     def __init__(self):
-        self._items = []
+        self.__items = []
 
     def push(self, item):
-        self._items.append(item)
+        self.__items.append(item)
     
     def pop(self):
-       return self._items.pop()
+       if self.__items != []:
+        return self.__items.pop()
 
     def peek(self):
-        return self._items[-1]
+        if not self.is_empty:
+            return self.__items[-1]
+        return None
     
     # decorator for getter of is_empty
     @property
@@ -322,14 +331,12 @@ class Stack:   # ----- attribute error on test in vocareum _Stack__items
     # decorator for getter of size
     @property
     def size(self):
-        return len(self._items)
+        return len(self.__items)
 
 # test case
 s1 = Stack()
-s1.push(10)
-s1.push(20)
 print(s1.size)
-# print(s1._Stack__items) ### Name Mangling - Python's backdoor to access the double underscore
+print(s1._Stack__items) ### Name Mangling - Python's backfoor to access the double underscore
 s1.push(2)
 assert not s1.is_empty
 assert s1.pop() == 2
@@ -366,21 +373,90 @@ class Queue:
     @property
     def size(self):
         return len(self._items)
+    
+# CS4. Write a class called `EvaluatePostfix` that evaluates postfix notation implemented using Stack data structure. 
+# Postfix notation is a way of writing expressions without parenthesis. 
+# For example, the expression `(1+2)*3` would be written as `1 2 + 3 *`. 
+# The class `EvaluatePostfix` has the following methods:
+# - `input(inp)`: which pushes the input one at a time. 
+#                 For example, to create a postfix notation `1 2 + 3 *`, we can call this method repetitively, 
+#                 e.g. `e.input('1'); e.input('2'); e.input('+'); e.input('3'); e.input('*')`. 
+#                 Notice that the input is of String data type. 
+# - `evaluate()`: which returns the output of the expression.
+#                 Postfix notation is evaluated using a Stack. 
+#                 The input streams from `input()` are stored in a Queue, which we will implement using Python's List. 
+#                 Note: If you have finished your homework on Queue, you can replace this part with your Queue. 
+# If the output of the Queue is a number, the item is pushed onto the stack. 
+# If it is an operator, we will apply the operator to the top two items in the stacks, pushing the result back onto the stack. 
+
+# Class definition: EvaluatePostfix
+class EvaluatePostfix:
+
+    operands = '0123456789'
+    operators = '+-*/'
+
+    def __init__(self):
+        self.expression = []
+        self.stack = Stack()
+
+    def input(self, item):
+        self.expression.append(item)
+
+    def evaluate(self):
+        ls_operands = list(self.operands)
+        for i in self.expression:
+            if i in ls_operands:
+                self.stack.push(int(i))
+            if i == '+':
+                a = self.stack.pop()
+                self.stack.push(self.stack.pop() + a)
+            if i == '-':
+                a = self.stack.pop()
+                self.stack.push(self.stack.pop() - a)
+            if i == '*':
+                a = self.stack.pop()
+                self.stack.push(self.stack.pop() * a)
+            if i == '/':
+                a = self.stack.pop()
+                self.stack.push(self.stack.pop() / a)
+        return self.stack.peek()
+    
+# test cases 
+pe = EvaluatePostfix()
+
+pe.input("2")
+pe.input("3")
+pe.input("+")
+print(pe.evaluate()== 5)
+print(pe.stack)
+
+pe.input("2")
+pe.input("3")
+print(pe.expression)
+pe.input("+")
+pe.input("6")
+
+print(pe.stack)
+pe.input("-")
+print(pe.evaluate()== -1)
 
 # CS5 - Queue with double stack
 class Stack:
 
     def __init__(self):
-        self._items = []
+        self.__items = []
 
     def push(self, item):
-        self._items.append(item)
+        self.__items.append(item)
     
     def pop(self):
-       return self._items.pop()
+       if self.__items != []:
+        return self.__items.pop()
 
     def peek(self):
-        return self._items[-1]
+        if self.size > 0:
+            return self.__items[-1]
+        return None
     
     # decorator for getter of is_empty
     @property
@@ -390,9 +466,12 @@ class Stack:
     # decorator for getter of size
     @property
     def size(self):
-        return len(self._items)
+        return len(self.__items)
+    
+    def __str__(self):
+        return str(self.__items)
 
-class Queue_with_Stack: # ----- attribute error with test case in vocareum is_empty
+class Queue_with_Stack:
     
     def __init__(self):
         # IN stack
@@ -401,24 +480,234 @@ class Queue_with_Stack: # ----- attribute error with test case in vocareum is_em
         self.right_stack = Stack()
 
     def enqueue(self, item):
-        self.left_stack.push(item)
+        self.right_stack.push(item)
     
     # move elements from IN to OUT
-    # left stack --> right stack 
+    # right stack --> left stack 
     def dequeue(self):
-        # move elements from left to right if right is empty
-        if self.right_stack.is_empty:
-            self._move_to_right()
-        return self.right_stack.pop()
+        # move elements from right to left if left is empty.
+        if self.left_stack.is_empty:
+            while self.right_stack.size > 0:
+                self.left_stack.push(self.right_stack.pop())
+        return self.left_stack.pop()
 
     def peek(self):
+        if self.is_empty:
+            return None
+        
+        if not self.left_stack.is_empty:
+            return self.left_stack._Stack__items[-1]
+        else:
+            return self.right_stack._Stack__items[0]
+        
+    @property
+    def is_empty(self):
+        if self.left_stack.is_empty:
+            return self.right_stack.is_empty
         if self.right_stack.is_empty:
-            self._move_to_right()
-        return self.right_stack.peek()
+            return self.left_stack.is_empty
+        
+    @property
+    def size(self):
+        if self.left_stack.is_empty:
+            return self.right_stack.size
+        return self.left_stack.size
 
     # private method (internal)
-    def _move_to_right(self):
-        # assume right stack is empty
-        while not self.left_stack.is_empty():
-            element = self.left_stack.pop()
-            self.right_stack.push(element)
+    # def _move_to_right(self):
+    #     # assume right stack is empty
+    #     while not self.left_stack.is_empty():
+    #         element = self.left_stack.pop()
+    #         self.right_stack.push(element)
+
+# test cases
+q1 = Queue_with_Stack()
+q1.enqueue(2)
+assert not q1.is_empty 
+assert q1.size == 1
+assert q1.dequeue() == 2
+assert q1.is_empty
+q1.enqueue(1)
+q1.enqueue(2)
+q1.enqueue(3)
+assert q1.size == 3
+assert q1.peek() == 1
+assert q1.dequeue() == 1
+assert q1.dequeue() == 2
+assert q1.dequeue() == 3
+assert q1.peek() == None
+
+# CS6. You need to complete CS5 before attempting this question. 
+# Compute the computational time to do enqueue operation for a list based 
+# Queue implementation versus a double-stack based Queue implementation. 
+# Which one is faster? Why? There are a few parts you need to fill up.
+# - `enqueue(q, array)`, which is a function to enqueue every element in the array to the Queue `q`.
+# - `dequeue(q, array)`, which is a function to dequeue every element in the array from the Queue `q`. 
+# Hint: you don't need the argument `array` but it is put here so that we can make use of the `run_function(f, x, y)`.
+# You also need to replace some of the `None` in the code to compute the computational time inside the for-loop.
+# First you need to paste the Queue implementation using list-based.
+
+# Class definition: List_Queue
+class Queue:
+    def __init__(self):
+        self.__items = []
+
+    def enqueue(self, item):
+        self.__items.append(item)
+    
+    def dequeue(self):
+        return self.__items.pop(0)
+    
+    def peek(self):
+        if self.__items.size > 0:
+            return self.__items[0]
+        return None
+    
+    @property
+    def is_empty(self):
+        return self.__items == []
+    
+    @property
+    def size(self):
+        return len(self.__items)
+    
+def run_function(f, x, y):
+    start = time.time()
+    f(x, y)
+    end = time.time()
+    return end - start
+
+def enqueue(q, array):
+    for i in array:
+        q.enqueue(i)
+
+def dequeue(q, array):
+    for _ in range(len(array)):
+        q.dequeue()
+
+def gen_random_int(number, seed):
+    random.seed(seed)
+    ls = list(range(number))
+    random.shuffle(ls)
+    return ls
+
+time_enqueue_list = []
+time_dequeue_list = []
+
+# set the maximum power for 10^power number of inputs
+maxpower = 5
+for n in range(1, maxpower + 1):
+    # create array for 10^1, 10^2, 10^3, etc.
+    # use seed = 100
+    array = gen_random_int(10**n, 100)
+
+    # create queue
+    queue = Queue()
+
+    # call run_function for enqueue
+    result_enqueue = run_function(enqueue, queue, array)
+    # call run_function for dequeue
+    result_dequeue = run_function(dequeue, queue, array)
+
+    time_enqueue_list.append(result_enqueue)
+    time_dequeue_list.append(result_dequeue)
+
+print(time_enqueue_list)
+print(time_dequeue_list)
+
+# Class definition: Stack_Queue
+class Queue:
+    def __init__(self):
+        self.left_stack = Stack()
+        self.right_stack = Stack()
+
+    def enqueue(self, item):
+        self.right_stack.push(item)
+
+    def dequeue(self):
+        if self.left_stack.is_empty:
+            while self.right_stack.size > 0:
+                self.left_stack.push(self.right_stack.pop())
+        return self.left_stack.pop()
+    
+    def peek(self):
+        if self.is_empty:
+            return None
+        
+        if not self.left_stack.is_empty:
+            return self.left_stack._Stack__items[-1]
+        else:
+            return self.right_stack_Stack__items[0]
+        
+    def __str__(self) -> str:
+        return str(self.right_stack)
+    
+    @property
+    def is_empty(self):
+        if self.left_stack.is_empty:
+            return self.right_stack.is_empty
+        if self.right_stack.is_empty:
+            return self.left_stack.is_empty
+        
+    @property
+    def size(self):
+        if self.left_stack.is_empty:
+            return self.right_stack.size
+        return self.left_stack.size
+    
+def run_function(f, x, y):
+    start = time.time()
+    f(x, y)
+    end = time.time()
+    return end - start
+
+def enqueue(q, array):
+    for i in array:
+        q.enqueue(i)
+
+def dequeue(q, array):
+    for _ in range(len(array)):
+        q.dequeue()
+
+def gen_random_int(number, seed):
+    random.seed(seed)
+    ls = list(range(number))
+    random.shuffle(ls)
+    return ls
+
+time_enqueue_stack = []
+time_dequeue_stack = []
+
+# set the maximum power for 10^power number of inputs
+maxpower = 5
+for n in range(1, maxpower + 1):
+    # create array for 10^1, 10^2, 10^3, etc.
+    # use seed = 100
+    array = gen_random_int(10**n, 100)
+
+    # create queue
+    queue = Queue()
+
+    # call run_function for enqueue
+    result_enqueue = run_function(enqueue, queue, array)
+    # call run_function for dequeue
+    result_dequeue = run_function(dequeue, queue, array)
+
+    time_enqueue_stack.append(result_enqueue)
+    time_dequeue_stack.append(result_dequeue)
+
+print(time_enqueue_stack)
+print(time_dequeue_stack)
+
+import matplotlib.pyplot as plt
+plt.plot(time_enqueue_list, 'o-')
+plt.plot(time_enqueue_stack, 'x-')
+plt.ylabel("Time (s)")
+plt.xlabel("order of input size, 10^n")
+plt.title("Enqueue Time")
+
+plt.plot(time_dequeue_list, 'o-')
+plt.plot(time_dequeue_stack, 'x-')
+plt.ylabel("Time (s)")
+plt.xlabel("order of input size, 10^n")
+plt.title("Dequeue Time")
