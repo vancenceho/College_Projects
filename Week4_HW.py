@@ -17,34 +17,34 @@ import math
 class Queue:
 
     def __init__(self):
-        self._items = []
+        self.__items = []
 
     def enqueue(self, value):
         if isinstance(value, int):
-            self._items.append(value)
+            self.__items.append(value)
     
     def dequeue(self):
-        if len(self._items) != 0:
-            return self._items.pop(0)
+        if len(self.__items) != 0:
+            return self.__items.pop(0)
         else:
             return None
     
     def peek(self):
-        if len(self._items) != 0:
-            return self._items[0]
+        if len(self.__items) != 0:
+            return self.__items[0]
         else:
             return None
     
     @property
     def is_empty(self):
-        if len(self._items) == 0:
-            return True
-        else:
-            return False
+        return self.__items == []
     
     @property
     def size(self):
-        return len(self._items)
+        return len(self.__items)
+    
+    def __str__(self) -> str:
+        return str(self.__items)
 
 # test cases
 q1 = Queue()
@@ -78,13 +78,14 @@ class Coordinate:
     def __init__(self, x = 0, y = 0):
         self.x = x
         self.y = y
+    
     # decorator for distance getter function
     @property 
     def distance(self):
         return math.sqrt(self.x * self.x + self.y * self.y)
     
     def __str__(self):
-        return ("{}, {}".format(self.x, self.y))
+        return ("({}, {})".format(self.x, self.y))
     
 # RobotTurtle class definition
 class RobotTurtle:
@@ -182,15 +183,10 @@ class TurtleWorld:
         self.turtles = {}
 
     def move_turtle(self, name, movement):
-        if name in self.turtles:
-            turtle = self.turtles[name]
-            for move in movement:
-                if move in self.valid_movements:
-                    direction = self.movement_map[move]
-                    for _ in range(turtle.speed):
-                        turtle.move(direction)
-                else:
-                    print("Ignoring invalid movement: {}".format(move))
+        for i in range(len(movement)):
+            if movement[i] in self.valid_movements:
+                self.turtles[name].move(self.movement_map[movement[i]])
+        return self.turtles[name].pos
 
     def add_turtle(self, name, speed):
         if name not in self.turtles:
@@ -224,3 +220,168 @@ world.move_turtle('t1', 'uulrdd')
 assert str(world.turtles['t1'].pos) == '(0, 0)'
 world.move_turtle('t1', 'ururur')
 assert str(world.turtles['t1'].pos) == '(6, 6)'
+
+# HW4. Modify the class `TurtleWorld` to include the following attribute and methods:
+# - `movement_queue` which is an attribute of the type `Queue` to store the movement list.
+# - `add_movement(turtle, movement)` which adds turtle movement to the queue `movement_queue` 
+#    to be run later. The argument `turtle` is a string containing the turtle's name. 
+#    The argument `movement` is another string for the movement. 
+#    For example, value for `turtle` can be something like `'t1'` 
+#    while the value for the `movement` can be something like `'uullrrdd'`.
+# - `run()` which executes all the movements in the queue.
+
+# Class definition: Modified TurtleWorld
+class TurtleWorld:
+    valid_movements = set('udlr')
+    movement_map = {'u': 'up', 'd': 'down', 'l': 'left', 'r': 'right'}
+
+    def __init__(self):
+        self.turtles = {}
+        # add a code to create a Queue for movement
+        self.movement_queue = Queue()
+
+    def add_movement(self, turtle, movement):
+        # store both turtle and movement as a tuple.
+        self.movement_queue.enqueue((turtle, movement))
+
+    def run(self):
+        while not self.movement_queue.is_empty:
+            name, movement = self.movement_queue.dequeue()
+            self.move_turtle(name, movement)
+
+    def move_turtle(self, name, movement):
+        for i in range(len(movement)):
+            if movement[i] in self.valid_movements:
+                self.turtles[name].move(self.movement_map[movement[i]])
+        return self.turtles[name].pos
+
+    def add_turtle(self, name, speed):
+        self.turtles[name] = RobotTurtle(name, speed)
+
+    def remove_turtle(self, name):
+        del self.turtles[name]
+
+    def list_turtles(self):
+        sorted_names = sorted(self.turtles.keys())
+        return sorted_names
+    
+# test cases 
+world = TurtleWorld()
+assert isinstance(world.movement_queue, Queue)
+
+world.add_turtle('t1', 1)
+world.add_turtle('t2', 2)
+world.add_movement('t1', 'ur')
+world.add_movement('t2', 'urz')
+print(str(world.movement_queue))
+print(str(world.movement_queue.size))
+assert str(world.turtles['t1'].pos) == '(0, 0)'
+assert str(world.turtles['t2'].pos) == '(0, 0)'
+assert world.movement_queue.size == 2
+
+world.run()
+assert str(world.turtles['t1'].pos) == '(1, 1)'
+assert str(world.turtles['t2'].pos) == '(2, 2)'
+
+world.add_movement('t1', 'ur')
+world.add_movement('t2', 'urz')
+
+world.run()
+assert str(world.turtles['t1'].pos) == '(2, 2)'
+assert str(world.turtles['t2'].pos) == '(4, 4)'
+
+# HW5. Implement a radix sorting machine. A radix sort for base 10 integers is a *mechanical* sorting technique that utilizes a collection of bins:
+# - one main bin 
+# - 10 digit-bins
+
+# Each bin acts like a *queue* and maintains its values in the order that they arrive. The algorithm works as follows:
+# - it begins by placing each number in the main bin. 
+# - Then it considers each value digit by digit. 
+#   The first value is removed from the main bin and placed in a digit-bin corresponding to the digit being considered. 
+#   For example, if the ones digit is being considered, 534 will be placed into digit-bin 4 and 667 will placed into digit-bin 7. 
+# - Once all the values are placed into their corresponding digit-bins, 
+#   the values are collected from bin 0 to bin 9 and placed back in the main bin (in that order). 
+# - The process continues with the tens digit, the hundreds, and so on. 
+# - After the last digit is processed, the main bin will contain the values in ascending order.
+
+# Create a class `RadixSort` that takes in a List of Integers during object instantiation. 
+# The class should have the following properties:
+# - `items`: is a List of Integers containing the numbers.
+
+# It should also have the following methods:
+# - `sort()`: which returns the sorted numbers from `items` as an `list` of Integers.
+# - `max_digit()`: which returns the maximum number of digits of all the numbers in `items`. 
+#                  For example, if the numbers are 101, 3, 1041, 
+#                  this method returns 4 as the result since the maximum digit is four from 1041. 
+# - `convert_to_str(items)`: which returns items as a list of Strings (instead of Integers). 
+#                            This function should pad the higher digits with 0 when converting an Integer to a String. 
+#                            For example if the maximum digit is 4, the following items are converted as follows. 
+#                            From `[101, 3, 1041]` to `["0101", "0003", "1041"]`.
+# Hint: Your implementation should make use of the generic `Queue` class, which you created, for the bins.
+
+# Class definition: RadixSort
+class RadixSort:
+
+    def __init__(self, MyList) -> None:
+        self.items = MyList
+
+    def max_digit(self):
+        largest_number_of_digits = 0
+        for i in self.items:
+            if len(str(i)) > largest_number_of_digits:
+                largest_number_of_digits = len(str(i))
+        return largest_number_of_digits
+    
+    def convert_to_str(self, items):
+        number = self.max_digit()
+        return [(number - len(str(x))) * "0" + str(x) for x in items if len(str(x)) <= number]
+    
+    def sort(self):
+        number = self.max_digit()
+        ls = self.convert_to_str(self.items)
+        main_bin = Queue()
+        zero_bin = Queue()
+        one_bin = Queue()
+        two_bin = Queue()
+        three_bin = Queue()
+        four_bin = Queue()
+        five_bin = Queue()
+        six_bin = Queue()
+        seven_bin = Queue()
+        eight_bin = Queue()
+        nine_bin = Queue()
+        digit_dict = {'0': zero_bin,
+                      '1': one_bin,
+                      '2': two_bin,
+                      '3': three_bin,
+                      '4': four_bin,
+                      '5': five_bin,
+                      '6': six_bin,
+                      '7': seven_bin,
+                      '8': eight_bin,
+                      '9': nine_bin}
+        for i in ls:
+            # enqueue elements from list to main queue e.g. 1001, 1302, 1101
+            main_bin.enqueue(i)     
+
+        # loop through each digits place of numbers
+        for i in range(number - 1, -1, -1):
+            for _ in range(len(ls)):
+                digit_dict[main_bin.peek()[i]].enqueue(main_bin.dequeue())
+            
+            for key in digit_dict:
+                while not digit_dict[key].is_empty:
+                    main_bin.enqueue(digit_dict[key].dequeue())
+
+        return [int(main_bin.dequeue()) for x in range(len(ls))]
+    
+# test cases 
+list1 = RadixSort([101, 3, 1041])
+assert list1.items == [101,3,1041]
+assert list1.max_digit() == 4
+assert list1.convert_to_str(list1.items) == ["0101", "0003", "1041"]
+ans = list1.sort()
+print(ans)
+assert ans == [3, 101, 1041]
+list2 = RadixSort([23, 1038, 8, 423, 10, 39, 3901])
+assert list2.sort() == [8, 10, 23, 39, 423, 1038, 3901]
