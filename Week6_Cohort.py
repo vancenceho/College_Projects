@@ -364,50 +364,134 @@ assert mf1 == mf2
 #                                  It should return None when the Deque is empty.
 
 # Class definition: Stack
+class Stack:
+
+    def __init__(self) -> None:
+        self.__items = []
+
+    def push(self, item):
+        self.__items.append(item)
+
+    def pop(self):
+        if self.__items != []:
+            return self.__items.pop()
+        
+    def peek(self):
+        if not self.is_empty:
+            return self.__items[-1]
+        return None
+    
+    @property
+    def is_empty(self):
+        return self.__items == []
+    
+    @property
+    def size(self):
+        return len(self.__items)
+
+a = Stack()
+print(a.is_empty)
+a.push(1)
+a.push(2)
+print(a.is_empty)
+print(a.size)
+assert a.pop() == 2
+print(a.size)
+assert a.pop() == 1
+print(a.size)
+print(a.pop())
 
 # Class definition: Queue -> Using Stack
+class Queue:
+    
+    def __init__(self) -> None:
+        # OUT Stack
+        self.left_stack = Stack()
+        # IN Stack
+        self.right_stack = Stack()
+
+    def enqueue(self, item):
+        self.right_stack.push(item)
+
+    def dequeue(self):
+        # move elements from right to left 
+        if self.left_stack.is_empty:
+            # while the right stack has elements
+            while self.right_stack.size > 0:
+                # push whatever elements I have in the right stack to the left stack
+                self.left_stack.push(self.right_stack.pop())
+        # pop the left stack which is the first element being added in the Queue
+        return self.left_stack.pop()
+    
+    def peek(self):
+        # base case 
+        if self.is_empty:
+            return None
+        
+        if self.left_stack.is_empty:
+            return self.right_stack._Stack__items[0]
+        else:
+            return self.left_stack.peek()
+        
+    @property
+    def is_empty(self):
+        return self.left_stack.is_empty and self.right_stack.is_empty
+    
+    @property
+    def size(self):
+        if self.left_stack.is_empty:
+            return self.right_stack.size
+        return self.left_stack.size
+
+q = Queue()
+q.enqueue(1)
+q.enqueue(2)
+q.enqueue(3)
+print(q.is_empty)
+print(q.size)
+assert q.peek() == 1
+print(q.dequeue())
+print(q.dequeue())
+assert q.peek() == 3
 
 # Class definition: Deque
 # class Deque(Queue):
+    
+    def add_front(self, item):
+        self.left_stack.push(item)
 
-#     def add_front(self, item):
-#         # since we define right stack as OUT, we need to push in the right stack.
-#         # we inherited the push and right_stack from the Queue class.
-#         self.right_stack.push(item)
+    # same as enqueue for Queue() class
+    def add_rear(self, item):
+        self.enqueue(item)
+    
+    # same as dequeue for Queue() class
+    def remove_front(self):
+        return self.dequeue()
+    
+    def remove_rear(self):
+        if self.right_stack.is_empty:
+            self._left_to_right()
+        return self.right_stack.pop()
+    
+    # same as peek for Queue() class
+    def peek_front(self):
+        return self.peek()
+    
+    def peek_rear(self):
+        while self.left_stack.size > 0:
+            self._left_to_right()
+            return self.right_stack._Stack__items[-1]
+        return None
+    
+    # helper function to move items from left to right stack to keep the proper order
+    def _left_to_right(self):
+        while not self.left_stack.is_empty:
+            self.right_stack.push(self.left_stack.pop()) 
 
-#     # same as dequeuing for a Queue.
-#     def remove_front(self):
-#         return self.dequeue()
-
-#     # same as peek for a Queue. 
-#     def peek_front(self):
-#         return self.peek()
-
-#     # same as enqueue for a Queue.
-#     def add_rear(self, item):
-#         self.enqueue(item)
-
-#     def peek_rear(self):
-#         if self.left_stack.is_empty:
-#             self._move_to_left()
-#         return self.left_stack.peek()
-
-#     def remove_rear(self):
-#         if self.left_stack.is_empty:
-#             self._move_to_left()
-#         # self.left_stack is inherited from the Queue class. 
-#         return self.left_stack.pop()
-
-#     def left_to_right(self):
-#         # Ignore, bcoz cohort problem assumes that right is IN and left is OUT 
-#         # but Prof Norman uses left as IN and right as OUT.
-#         # It's ok bcoz the client using your class does not need to care about such details.
-#         pass
-
-#     def _move_to_left(self):
-#         while self.right_stack.is_empty:
-#             element = self.right_stack.pop()
-#             self.left_stack.push(element)
+    # def _move_to_left(self):
+    #     while self.right_stack.is_empty:
+    #         element = self.right_stack.pop()
+    #         self.left_stack.push(element)
 
 # CS5-Prelude-1. ArrayFixedSize class (Given): 
 # Write a class called ArrayFixedSize that simulate a fixed size array. 
@@ -498,9 +582,152 @@ print(len(a)) ### calls the __len__ magic method
 #                This method should call _get(index) in the child class which returns the item at 
 #                the specified index. If there is no more element, it should raise StopIteration.
 
+from abc import abstractmethod
 
-### INSERT CODE HERE ### 
+class MyAbstractList(c.Iterator):
+    
+    def __init__(self, list_items):
+        # iterate over every element and call self.append(item)
+        self.size = 0
+        self._idx = 0
+        for item in list_items:
+            self.append(item)
+    
+    @property
+    def is_empty(self):
+        return self.size == 0
+    
+    def append(self, item):
+        # call add_at() method here
+        self._add_at(self.size, item)
+        
+    def remove(self, item):
+        # you should use remove_at() method here
+        idx = self._index_of(item)
+        if  idx >= 0:
+            self._remove_at(idx)
+            return True
+        else:
+            return False
+        
+    def __getitem__(self, index):
+        return self._get(index)
+    
+    def __setitem__(self, index, value):
+        # call set_at(index, value) method here
+        self._set_at(index, value)
+        
+    def __delitem__(self, index):
+        # call remove_at() method here
+        self._remove_at(index)
+    
+    def __len__(self):
+        return self.size
+        
+    def __iter__(self):
+        self._idx = 0
+        return self
+        
+    def __next__(self):
+        if self._idx < self.size:
+            n_item = self._get(self._idx)
+            self._idx += 1
+            return n_item
+        else:
+            raise StopIteration
+    
+    # the following methods should be implemented in the child class
+    @abstractmethod
+    def _get(self, index):
+        pass
 
+    @abstractmethod
+    def _set_at(self, index, item):
+        pass
+
+    @abstractmethod
+    def _add_at(self, index, item):
+        pass
+
+    @abstractmethod
+    def _remove_at(self, index):
+        pass
+
+    @abstractmethod
+    def _index_of(self, item):
+        pass
+
+# creating a class PythonList inheriting from MyAbstractList
+# this is just for testing the MyAbstractList class
+
+class PythonList(MyAbstractList):
+    
+    def __init__(self, init_data=[]):
+        self.data = []
+        super().__init__(init_data)
+    
+    def _add_at(self, index, item):
+        self.data.insert(index, item)
+        self.size += 1
+        
+    def _set_at(self, index, item):
+        self.data[index] = item
+        
+    def _remove_at(self, index):
+        self.data.pop(index)
+        self.size -= 1
+        
+    def _get(self, index):
+        if 0 <= index < self.size:
+            return self.data[index]
+        else:
+            raise IndexError()
+            
+    def _index_of(self, item):
+        try:
+            idx = self.data.index(item)
+            return idx
+        except:
+            return -1
+
+# test cases
+f = PythonList(list(range(10)))
+
+# Testing init
+assert f.data == list(range(10))
+
+# Testing size property
+assert f.size == 10
+
+# Testing is_empty property
+assert not f.is_empty
+
+# Testing append method
+f.append(10)
+assert f.data == list(range(11))
+
+# Testing remove method
+f.remove(5)
+assert f.data == [0, 1, 2, 3, 4, 6, 7, 8, 9, 10]
+f._add_at(5, 5)
+f.append(5)
+f.remove(5)
+assert f.data == [0, 1, 2, 3, 4, 6, 7, 8, 9, 10, 5]
+assert not f.remove(11)
+
+# Testing getitem method
+assert [f[i] for i in range(len(f))] == [0, 1, 2, 3, 4, 6, 7, 8, 9, 10, 5]
+f[0] = -1
+assert [f[i] for i in range(len(f))] == [-1, 1, 2, 3, 4, 6, 7, 8, 9, 10, 5]
+
+# Testing delitem
+del f[0]
+assert f[0] == 1
+
+# Testing __next__
+assert [x for x in f] == [ 1, 2, 3, 4, 6, 7, 8, 9, 10, 5]
+# Testing __iter__
+assert [x for x in f] == [ 1, 2, 3, 4, 6, 7, 8, 9, 10, 5]
 
 # CS6 
 import numpy as np 
@@ -514,50 +741,76 @@ class MyArrayList(MyAbstractList):
 
     def _add_at(self, index, item):
         self._ensure_capacity()
-        # add code
-        pass 
-    
+        # do the following:
+        # 1. copy data by shifting it to the right from index position to the end
+        # 2. set item at index
+        # 3. add size by 1
+        self._set_at(index, item)
+        self.size = self.size + 1
+
     def _set_at(self, index, value):
-        # put data at location index
-        # self.data is an ArrayFixedSize object
         self.data[index] = value
 
     def _remove_at(self, index):
-        # add code 
-        pass
-
-    def _get(self, index):
-        # to get the element at location index and return it
-        # NOT POSSIBLE IN OTHER LANGUAGE
         if 0 <= index < self.size:
-            # self.data is an object of ArrayFixedSize (Prelude 1)
+            # do the following
+            # 1. get the element at index
+            # 2. copy the data by shifting it to the left from index to the end
+            # 3. reduce size by 1
+            # 4. return the element at index
+            element = self.data[index]
+            for i in range(index, self.size - 1):
+                self.data[i] = self.data[i + 1]
+            self.size = self.size - 1
+            return element
+        else:
+            raise IndexError()
+        
+    def _get(self, index):
+        if 0 <= index < self.size:
             return self.data[index]
         else:
             raise IndexError()
-
+        
     def _index_of(self, item):
         # iterate over the data and return the index
         # if not found return -1
-        ### ADD CODE HERE
-        pass
-
+        for i in range(self.size):
+            if item == self.data[i]:
+                return i
+        return -1
+    
     def _ensure_capacity(self):
         if self.size >= len(self.data):
             new_data = ArrayFixedSize(self.size * 2 + 1)
             self._copy(self.data, 0, new_data, 0)
             self.data = new_data
-
+            
     def _copy(self, source, idx_s, dest, idx_d):
-        for idx in range(idx_s, len(source)):
+        for idx in range(idx_s,len(source)):
             offset = idx - idx_s
             dest[idx_d + offset] = source[idx]
-
+            
     def _clear(self):
         self.data = ArrayFixedSize(MyArrayList.INITIAL_CAPACITY)
         self.size = 0
-
+        
     def __str__(self):
         out = "["
         for idx in range(self.size):
             out += f"{self.get(idx):}, "
         return out[:-2] + "]"
+
+# test cases
+a = MyArrayList([1,2,3])
+assert [x for x in a] == [1,2,3]
+assert a.size == 3
+assert not a.is_empty
+a.append(4)
+assert a.size == 4
+assert [x for x in a] == [1,2,3,4]
+assert [a[i] for i in range(len(a))] == [1,2,3,4]
+a[0] = -1
+assert [x for x in a] == [-1, 2,3,4]
+del a[0]
+assert [x for x in a] == [2,3,4]
